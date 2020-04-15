@@ -1,7 +1,9 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from rq import Queue
-from werkzeug.wsgi import DispatcherMiddleware
+# Sung fix
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+#from werkzeug.wsgi import DispatcherMiddleware
 
 from franz.openrdf.sail.allegrographserver import AllegroGraphServer
 from franz.openrdf.repository.repository import Repository
