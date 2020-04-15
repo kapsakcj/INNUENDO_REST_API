@@ -19,7 +19,7 @@ Flask-Security==1.7.5
 Flask-SQLAlchemy==2.1
 Flask-Triangle==0.5.4
 Flask-WhooshAlchemy==0.56
-Flask-WTF==0.12
+Flask-WTF==0.14.3
 flipflop==1.0
 functools32==3.2.3.post2
 guess-language==0.2
@@ -45,6 +45,6 @@ SQLAlchemy==1.0.13
 sqlalchemy-migrate==0.10.0
 sqlparse==0.1.19
 Tempita==0.5.2
-Werkzeug>=0.14
+Werkzeug>=0.16.1
 Whoosh==2.7.4
 WTForms==2.1
