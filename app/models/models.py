@@ -554,6 +554,26 @@ class Salmonella(db.Model):
     platform_tag = db.Column(db.String(255))
     timestamp = db.Column(db.DateTime)
 
+class Vibrio(db.Model):
+    """
+    Defines the species specific storage of profiles and its classification.
+    Vibrio specification.
+    """
+
+    __tablename__ = "vibrio"
+    __bind_key__ = 'mlst_database'
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(255), unique=True)
+    version = db.Column(db.String(255))
+    classifier_l1 = db.Column(db.String(255))
+    classifier_l2 = db.Column(db.String(255))
+    classifier_l3 = db.Column(db.String(255))
+    allelic_profile = db.Column(JSON)
+    strain_metadata = db.Column(JSON)
+    # Tell if it is legacy or from the platform
+    platform_tag = db.Column(db.String(255))
+    timestamp = db.Column(db.DateTime)
+
 
 class Core_Schemas(db.Model):
     """
