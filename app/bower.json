@@ -1,6 +1,6 @@
 {
-  "name": "INNUENDO_REST_API",
-  "homepage": "https://github.com/bfrgoncalves/INNUENDO_REST_API",
+  "name": "innuendo-rest-api",
+  "homepage": "https://github.com/kapsakcj/INNUENDO_REST_API",
   "description": "innuendo routes and frontend",
   "main": "run.py",
   "moduleType": [],
