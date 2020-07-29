@@ -98,11 +98,38 @@ if [ ! -d "${1}/${2}/schemas/schema_seed_campy_roary_V5" ]; then
     find ${1}/${2}/schemas/schema_seed_campy_roary_V5/*.fasta > listGenes.txt
 fi
 
+# Get Vibrio cholera schema. If already there, doesnt do nothing.
+if [ ! -d "${1}/${2}/schemas/vcholerae_schema_v2" ]; then
+
+    echo "---> Downloading Vibrio cholera schema  ..."
+    cd ${1}/${2}/schemas/
+    #wget https://github.com/bfrgoncalves/INNUENDO_schemas/releases/download/v1.0/Salmonella_schema.tar.gz
+    wget https://github.com/kapsakcj/INNUENDO_schemas/raw/master/vcholerae_schema_v2.tar.gz
+
+    # we will need this line later
+    #wget https://raw.githubusercontent.com/kapsakcj/INNUENDO_schemas/master/Vcholera_correct_classification.txt
+
+    echo "---> Extracting Vibrio cholera schema  ..."
+    tar zxf vcholerae_schema_v2.tar.gz
+    rm -rf vcholerae_schema_v2.tar.gz
+
+    echo "---> Parsing bad formatted alleles  ..."
+    cd ${1}/${2}/schemas/vcholerae_schema_v2
+    grep -P "[\x80-\xFF]" *.fasta | cut -f1 -d":" > bad_files.txt
+    for i in `cat bad_files.txt`; do echo $i; cat ${i} | tr -d '\200-\377' > ${i}.mod; done
+    for i in `ls *.mod`; do mv $i ${i%.mod}; done
+
+    find ${1}/${2}/schemas/vcholerae_schema_v2/*.fasta > listGenes.txt
+
+fi
+
 # Create prodigal_training_files dir if dont exist
 mkdir -p ${1}/prodigal_training_files
 
 
 count_p=$(ls ${1}/prodigal_training_files | wc -l)
+
+# TODO - fork mickaelsilva's prodigal training files repo, add VC trn file
 
 # Get Prodigal training files
 if [ $count_p -eq 0 ]; then
