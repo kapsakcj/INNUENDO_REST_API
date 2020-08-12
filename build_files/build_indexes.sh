@@ -247,3 +247,58 @@ if [ ! -f "${1}/${4}/legacy_profiles/profiles_Cjejuni.tsv" ]; then
     flask/bin/python mlst_profiles_to_db.py -i ${1}/${4}/legacy_profiles/profiles_Cjejuni.tsv -c ${1}/${4}/classifications/goeBURST_cgMLST_4_59_292_campy.txt -m ${1}/${4}/legacy_metadata/Campylobacter_jejuni_metadata.txt -d Campylobacter -p NFP -v ${4}
 
 fi
+
+# Check if the V. cholerae file exists in the out directory, If not, it
+# will download all the required files and build the Salmonella database.
+if [ ! -f "${1}/${4}/legacy_profiles/profiles_VibrioCholerae.tsv" ]; then
+
+     echo "---> Downloading legacy dataset  ..."
+     cd ${1}/${4}/legacy_profiles
+     # Get wgMLST profiles for V. cholerae
+     wget https://raw.githubusercontent.com/kapsakcj/INNUENDO_schemas/master/Vcholerae_cgMLST_alleleProfiles.txt
+     mv Vcholerae_cgMLST_alleleProfiles.txt profiles_VibrioCholerae.tsv
+     # Get V. cholerae metadata for the legacy dataset
+     wget https://raw.githubusercontent.com/kapsakcj/INNUENDO_schemas/master/Vcholerae_metadata.txt
+     mv Vcholerae_metadata.txt Vibrio_cholerae_metadata.txt
+     # Get the list of cgMLST genes for V. cholerae in the legacy schema
+     wget https://raw.githubusercontent.com/kapsakcj/INNUENDO_schemas/master/Vcholerae_cgMLST_2404_listGenes.txt
+     mv Vcholerae_cgMLST_2404_listGenes.txt cgMLST_list_VibrioCholerae.txt
+     # Get INNUENDO classification file
+     wget https://raw.githubusercontent.com/kapsakcj/INNUENDO_schemas/master/Vcholera_correct_classification.txt
+     # no need to rename our VC correct classification file
+     #mv Salmonella_goeBURST_cgMLST_cleaned.-.goeBURST_cgMLST_cleaned.tsv goeBURST_cgMLST_7_338_997_salmonella.txt.1
+
+     # move metadata
+     mv Vibrio_cholerae_metadata.txt ../legacy_metadata/
+     # move INNUENDO classification file
+     mv Vcholera_correct_classification.txt ../classifications/
+
+     cd ${innuendo_dir}
+
+     echo "---> Parsing mlst profiles file  ..."
+     python extract_core_from_wg.py -i ${1}/${4}/legacy_profiles/profiles_VibrioCholerae.tsv -g ${1}/${4}/legacy_profiles/cgMLST_list_VibrioCholerae.txt -o ${1}/${4}/legacy_profiles/results_alleles_vibrio_wg --inverse --onlyreplace
+
+     echo "---> Extracting mlst profiles ..."
+     python extract_core_from_wg.py -i ${1}/${4}/legacy_profiles/profiles_VibrioCholerae.tsv -g ${1}/${4}/legacy_profiles/cgMLST_list_VibrioCholerae.txt -o ${1}/${4}/legacy_profiles/results_alleles_vibrio_core --inverse
+
+     echo "---> Copying profiles headers files ..."
+     cp ${1}/${4}/legacy_profiles/results_alleles_vibrio_core_headers.txt ${1}/${4}/core_lists/vibrio_headers_core.txt
+     cp ${1}/${4}/legacy_profiles/results_alleles_vibrio_wg_headers.txt ${1}/${4}/core_lists/vibrio_headers_wg.txt
+
+     echo "---> Copying initial profile files for index build ..."
+     rm ${1}/${4}/indexes/vibrio_wg_profiles.tab
+     rm ${1}/${4}/indexes/vibrio_core_profiles.tab
+     cp -v ${1}/${4}/legacy_profiles/results_alleles_vibrio_core.tsv ${1}/${4}/indexes/vibrio_core_profiles.tab
+     cp -v ${1}/${4}/legacy_profiles/results_alleles_vibrio_wg.tsv ${1}/${4}/indexes/vibrio_wg_profiles.tab
+
+     echo "---> Building profile file index ..."
+     rm ${1}/${4}/indexes/vibrio_core.idx
+     rm ${1}/${4}/indexes/vibrio_wg.idx
+     rm ${1}/${4}/indexes/vibrio_core.ids
+     rm ${1}/${4}/indexes/vibrio_wg.ids
+     cat ${1}/${4}/indexes/vibrio_core_profiles.tab | ${2}/src/main -i ${1}/${4}/indexes/vibrio_core -b
+     cat ${1}/${4}/indexes/vibrio_wg_profiles.tab | ${2}/src/main -i ${1}/${4}/indexes/vibrio_wg -b
+
+     echo "---> Populating Profile Database ..."
+     flask/bin/python mlst_profiles_to_db.py -i ${1}/${4}/legacy_profiles/profiles_VibrioCholerae.tsv -c ${1}/${4}/classifications/Vcholera_correct_classification.txt -m ${1}/${4}/legacy_metadata/Vibrio_cholerae_metadata.txt -d Vibrio -p NFP -v ${4}
+fi
