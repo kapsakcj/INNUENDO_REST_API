@@ -129,15 +129,16 @@ mkdir -p ${1}/prodigal_training_files
 
 count_p=$(ls ${1}/prodigal_training_files | wc -l)
 
-# TODO - fork mickaelsilva's prodigal training files repo, add VC trn file
 
 # Get Prodigal training files
 if [ $count_p -eq 0 ]; then
 
-    echo "---> Downloading prodigal training file  ..."
+#    echo "---> Downloading prodigal training file  ..."
     cd ${1}/prodigal_training_files
-    git clone https://github.com/mickaelsilva/prodigal_training_files.git
+#    git clone https://github.com/mickaelsilva/prodigal_training_files.git
 
+    echo "---> Downloading prodigal training file from Curtis' forked repo of prodigal training files ..."
+    git clone https://github.com/kapsakcj/prodigal_training_files.git
 fi
 
 # Create serotyping dir if dont exist
